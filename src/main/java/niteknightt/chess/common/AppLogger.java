@@ -5,14 +5,21 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
-import java.util.Stack;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class GameLogger {
-    public static String fileNameStartText = "gamelog_";
+/**
+ * Every app should use this as their main logger. Singleton.
+ */
+public class AppLogger {
+    private static AppLogger _instance = null;
+
+    public static String fileNameStartText = "app_";
     public static String fileNameExtension = ".log";
     public static String fileNameFull = "";
+
+    public static Enums.LogLevel setLogLevel = Constants.APP_DEFAULT_LOG_LEVEL;
+    public static boolean setAlsoToStdout = true;
 
     protected BufferedWriter _fileWriter;
     protected long _currentLogId;
@@ -20,49 +27,57 @@ public class GameLogger {
     protected long _currentIsReadyLogId;
     protected Enums.LogLevel _logLevel;
     protected Lock _writeLock = new ReentrantLock(true);
+    protected boolean _alsoToStdout = false;
 
-    public GameLogger(Enums.LogLevel logLevel) {
+    public static synchronized AppLogger getInstance() {
+        if (_instance == null) {
+            _instance = new AppLogger(setLogLevel, setAlsoToStdout);
+        }
+        return _instance;
+    }
+
+    private AppLogger(Enums.LogLevel logLevel, boolean alsoToStdout) {
         _logLevel = logLevel;
+        _alsoToStdout = alsoToStdout;
         init();
     }
 
     protected void init() {
-        String dateGameStarted = Helpers.getDateForGameLog();
         fileNameFull = System.getenv(Constants.ENV_VAR_RUNTIME_FILE_PATH)
                 + File.separator
-                + Constants.GAME_LOGS_SUBDIR
+                + Constants.APP_LOGS_SUBDIR
                 + File.separator
                 + fileNameStartText
-                + dateGameStarted
+                + Helpers.formatDateForFilename(Helpers.appStartDate())
                 + fileNameExtension;
         try {
             _fileWriter = new BufferedWriter(new FileWriter(fileNameFull));
         }
         catch (IOException e) {
-            throw new RuntimeException("Failed to open game log file for writing: " + fileNameFull);
+            throw new RuntimeException("Failed to open bot log file for writing: " + fileNameFull);
         }
 
         _currentLogId = Helpers.getNextLogId();
         _currentInputLogId = 0;
     }
 
-    public void debug(String gameId, String category, String text) {
-        write(Enums.LogLevel.DEBUG, gameId, category, text);
+    public void debug(String text) {
+        write(Enums.LogLevel.DEBUG, text);
     }
 
-    public void info(String gameId, String category, String text) {
-        write(Enums.LogLevel.INFO, gameId, category, text);
+    public void info(String text) {
+        write(Enums.LogLevel.INFO, text);
     }
 
-    public void warning(String gameId, String category, String text) {
-        write(Enums.LogLevel.WARNING, gameId, category, text);
+    public void warning(String text) {
+        write(Enums.LogLevel.WARNING, text);
     }
 
-    public void error(String gameId, String category, String text) {
-        write(Enums.LogLevel.ERROR, gameId, category, text);
+    public void error(String text) {
+        write(Enums.LogLevel.ERROR, text);
     }
 
-    public void write(Enums.LogLevel level, String gameId, String category, String text) {
+    public void write(Enums.LogLevel level, String text) {
         try {
             _writeLock.lock();
 
@@ -80,14 +95,6 @@ public class GameLogger {
                     .append(Common.Log.DOUBLEQUOTE)
                     .append(Common.Log.DELIMITER)
                     .append(Common.Log.DOUBLEQUOTE)
-                    .append(gameId)
-                    .append(Common.Log.DOUBLEQUOTE)
-                    .append(Common.Log.DELIMITER)
-                    .append(Common.Log.DOUBLEQUOTE)
-                    .append(category)
-                    .append(Common.Log.DOUBLEQUOTE)
-                    .append(Common.Log.DELIMITER)
-                    .append(Common.Log.DOUBLEQUOTE)
                     .append(text)
                     .append(Common.Log.DOUBLEQUOTE)
                     .append(Common.Log.NEWLINE);
@@ -97,13 +104,17 @@ public class GameLogger {
                 _fileWriter.flush();
             }
             catch (IOException e) {
-                throw new RuntimeException("Failed to write to game log file: " + fileNameFull);
+                throw new RuntimeException("Failed to write to bot log file: " + fileNameFull);
+            }
+
+            if (_alsoToStdout) {
+                System.out.println(level + ": " + text);
             }
 
             ++_currentLogId;
         }
         catch (Exception ex) {
-            AppLogger.getInstance().error("Exception while writing to game log: " + ex.toString());
+            System.out.println("ERROR: Exception while writing to bot log: " + ex.toString());
         }
         finally {
             _writeLock.unlock();

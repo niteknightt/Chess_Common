@@ -119,4 +119,9 @@ public class Enums {
         INFO,
         DEBUG
     }
+
+    public enum SettingsType {
+        NONE,
+        NITEKNIGHTTBOT
+    }
 }

@@ -1,8 +1,11 @@
 package niteknightt.chess.common;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Stack;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -13,9 +16,15 @@ public class Helpers {
     private static Date appStartDate = new Date();
 
     public static long LOG_ID_INCREMENT = 100000l;
-    public static String LAST_LOG_ID_FILE_NAME = "lastLogId.txt";
     public static SimpleDateFormat formatForFilename = new SimpleDateFormat("yyyyMMddHHmmss");
     public static SimpleDateFormat formatForLog = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+
+    private static String fileNameFull = "";
+    private static boolean logInitFlag = false;
+    private static Stack<String> _gameDates = new Stack<>();
+    private static Stack<String> _uciDates = new Stack<>();
+    private static Lock gameDateLock = new ReentrantLock(true);
+    private static Date gameStartDate = null;
 
     public static void initLog() {
         try {
@@ -26,6 +35,7 @@ public class Helpers {
             }
         }
         finally {
+            logInitFlag = true;
             logIdLock.unlock();
         }
     }
@@ -33,16 +43,24 @@ public class Helpers {
     public static Date appStartDate() { return appStartDate; }
 
     private static void loadLastLogId() {
-        String fileNameFull = new StringBuilder()
-                .append(Common.RESOURCE_PATH)
-                .append(LAST_LOG_ID_FILE_NAME)
-                .toString();
+        if (fileNameFull.length() == 0) {
+            fileNameFull = System.getenv(Constants.ENV_VAR_RUNTIME_FILE_PATH)
+                    + File.separator
+                    + Constants.PERSISTENCE_SUBDIR
+                    + File.separator
+                    + Constants.LAST_LOGID_FILENAME;
+        }
+        Path filePath = Paths.get(fileNameFull);
+        File file = filePath.toFile();
 
-        File f = new File(fileNameFull);
-        if(!f.exists() || f.isDirectory()) {
+        if (!file.exists()) {
             lastLogId = 1;
             saveLastLogId();
             return;
+        }
+
+        if (!file.isFile()) {
+            throw new RuntimeException("Last log ID file is not a file: " + fileNameFull);
         }
 
         try {
@@ -56,18 +74,13 @@ public class Helpers {
     }
 
     private static void saveLastLogId() {
-        String fileNameFull = new StringBuilder()
-                .append(Common.RESOURCE_PATH)
-                .append(LAST_LOG_ID_FILE_NAME)
-                .toString();
-
         try {
             var fileWriter = new BufferedWriter(new FileWriter(fileNameFull));
             fileWriter.write(Long.toString(lastLogId));
             fileWriter.close();
         }
         catch (IOException e) {
-            throw new RuntimeException("Error while reading last log ID: " + fileNameFull);
+            throw new RuntimeException("Error while saving last log ID: " + fileNameFull);
         }
     }
 
@@ -81,6 +94,9 @@ public class Helpers {
 
     public static long getNextLogId() {
         try {
+            if (!logInitFlag) {
+                initLog();
+            }
             logIdLock.lock();
             lastLogId += LOG_ID_INCREMENT;
             saveLastLogId();
@@ -106,5 +122,89 @@ public class Helpers {
             default:
                 throw new RuntimeException("Failed to find piece type for letter " + letter);
         }
+    }
+
+    public static boolean gameDateAlreadyUsed(String proposedDateStr) {
+        int pos = 0;
+        while (pos < _gameDates.size()) {
+            String curDate = _gameDates.elementAt(pos);
+            int compareResult = curDate.compareTo(proposedDateStr);
+            if (compareResult == 0) {
+                return true;
+            }
+            else if (compareResult < 0) {
+                break;
+            }
+            else {
+                AppLogger.getInstance().error("Found game date later than proposed date (" + curDate + " > " + proposedDateStr + ")");
+                ++pos;
+            }
+        }
+        return false;
+    }
+
+    public static boolean uciDateAlreadyUsed(String proposedDateStr) {
+        int pos = 0;
+        while (pos < _uciDates.size()) {
+            String curDate = _uciDates.elementAt(pos);
+            int compareResult = curDate.compareTo(proposedDateStr);
+            if (compareResult == 0) {
+                return true;
+            }
+            else if (compareResult < 0) {
+                break;
+            }
+            else {
+                AppLogger.getInstance().error("Found uci date later than proposed date (" + curDate + " > " + proposedDateStr + ")");
+                ++pos;
+            }
+        }
+        return false;
+    }
+
+    public static void setGameStartDate() {
+        gameStartDate = new Date();
+    }
+
+    public static String getDateForGameLog() {
+        if (gameStartDate == null) {
+            AppLogger.getInstance().error("Game start date was not set");
+            gameStartDate = new Date();
+        }
+        Date proposedDate = gameStartDate;
+        String proposedDateStr = formatDateForFilename(proposedDate);
+        try {
+            gameDateLock.lock();
+            while (gameDateAlreadyUsed(proposedDateStr)) {
+                proposedDate = new Date(proposedDate.getTime() + 1000);
+                proposedDateStr = formatDateForFilename(proposedDate);
+            }
+            _gameDates.push(proposedDateStr);
+        }
+        finally {
+            gameDateLock.unlock();
+        }
+        return proposedDateStr;
+    }
+
+    public static String getDateForUciLog() {
+        if (gameStartDate == null) {
+            AppLogger.getInstance().error("Uci start date was not set");
+            gameStartDate = new Date();
+        }
+        Date proposedDate = gameStartDate;
+        String proposedDateStr = formatDateForFilename(proposedDate);
+        try {
+            gameDateLock.lock();
+            while (uciDateAlreadyUsed(proposedDateStr)) {
+                proposedDate = new Date(proposedDate.getTime() + 1000);
+                proposedDateStr = formatDateForFilename(proposedDate);
+            }
+            _uciDates.push(proposedDateStr);
+        }
+        finally {
+            gameDateLock.unlock();
+        }
+        return proposedDateStr;
     }
 }

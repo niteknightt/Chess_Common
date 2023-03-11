@@ -1,6 +1,7 @@
 package niteknightt.chess.common;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
@@ -28,12 +29,14 @@ public class UciIoLogger {
     }
 
     protected void init() {
-        fileNameFull = new StringBuilder()
-                .append(Common.RESOURCE_PATH)
-                .append(fileNameStartText)
-                .append(Helpers.formatDateForFilename(Helpers.appStartDate()))
-                .append(fileNameExtension)
-                .toString();
+        String dateGameStarted = Helpers.getDateForUciLog();
+        fileNameFull = System.getenv(Constants.ENV_VAR_RUNTIME_FILE_PATH)
+                + File.separator
+                + Constants.UCI_LOGS_SUBDIR
+                + File.separator
+                + fileNameStartText
+                + dateGameStarted
+                + fileNameExtension;
         try {
             _fileWriter = new BufferedWriter(new FileWriter(fileNameFull));
         }
@@ -99,7 +102,7 @@ public class UciIoLogger {
             ++_currentLogId;
         }
         catch (Exception ex) {
-            System.out.println("ERROR: Exception while writing to log: " + ex.toString());
+            AppLogger.getInstance().error("Exception while writing to log: " + ex.toString());
         }
         finally {
             _writeLock.unlock();

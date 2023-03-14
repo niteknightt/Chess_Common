@@ -126,13 +126,15 @@ public class Enums {
         NITEKNIGHTTBOT
     }
 
-    public enum GameEvalMoveEvalCompare {
+    public enum MoveEvalCategory {
         NONE,
+        VERY_MUCH_BETTER_THAN_BEFORE,
         MUCH_BETTER_THAN_BEFORE,
         SOMEWHAT_BETTER_THAN_BEFORE,
         SAME_AS_BEFORE,
         SOMEWHAT_WORSE_THAN_BEFORE,
-        MUCH_WORSE_THAN_BEFORE
+        MUCH_WORSE_THAN_BEFORE,
+        VERY_MUCH_WORSE_THAN_BEFORE
     }
 
 }

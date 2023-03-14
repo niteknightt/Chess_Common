@@ -69,7 +69,8 @@ public class Enums {
         ABORTED,
         EXTERNAL_FORCED_END,
         ENDED_INTERNALLY,
-        FINISHED_BY_EVENT
+        FINISHED_BY_EVENT,
+        OPPONENT_LEFT
     }
 
     public enum ChatState {
@@ -124,4 +125,14 @@ public class Enums {
         NONE,
         NITEKNIGHTTBOT
     }
+
+    public enum GameEvalMoveEvalCompare {
+        NONE,
+        MUCH_BETTER_THAN_BEFORE,
+        SOMEWHAT_BETTER_THAN_BEFORE,
+        SAME_AS_BEFORE,
+        SOMEWHAT_WORSE_THAN_BEFORE,
+        MUCH_WORSE_THAN_BEFORE
+    }
+
 }

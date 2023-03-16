@@ -18,9 +18,6 @@ public class AppLogger {
     public static String fileNameExtension = ".log";
     public static String fileNameFull = "";
 
-    public static Enums.LogLevel setLogLevel = Constants.APP_DEFAULT_LOG_LEVEL;
-    public static boolean setAlsoToStdout = true;
-
     protected BufferedWriter _fileWriter;
     protected long _currentLogId;
     protected long _currentInputLogId;
@@ -28,22 +25,34 @@ public class AppLogger {
     protected Enums.LogLevel _logLevel;
     protected Lock _writeLock = new ReentrantLock(true);
     protected boolean _alsoToStdout = false;
+    protected Enums.SettingsType _settingsType;
 
-    public static synchronized AppLogger getInstance() {
+    public static synchronized AppLogger createInstance(Enums.SettingsType settingsType, Enums.LogLevel logLevel, boolean alsoToStdout) {
         if (_instance == null) {
-            _instance = new AppLogger(setLogLevel, setAlsoToStdout);
+            _instance = new AppLogger(settingsType, logLevel, alsoToStdout);
+        }
+        else {
+            _instance.error("Tried to create AppLogger when it already exists");
         }
         return _instance;
     }
 
-    private AppLogger(Enums.LogLevel logLevel, boolean alsoToStdout) {
+    public static synchronized AppLogger getInstance() {
+        if (_instance == null) {
+            throw new RuntimeException("Requested instance of AppLogger before it was created");
+        }
+        return _instance;
+    }
+
+    private AppLogger(Enums.SettingsType settingsType, Enums.LogLevel logLevel, boolean alsoToStdout) {
+        _settingsType = settingsType;
         _logLevel = logLevel;
         _alsoToStdout = alsoToStdout;
         init();
     }
 
     protected void init() {
-        fileNameFull = System.getenv(Constants.ENV_VAR_RUNTIME_FILE_PATH)
+        fileNameFull = Settings.getInstance().getRuntimeDirectory()
                 + File.separator
                 + Constants.APP_LOGS_SUBDIR
                 + File.separator

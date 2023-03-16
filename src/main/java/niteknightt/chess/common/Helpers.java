@@ -44,7 +44,7 @@ public class Helpers {
 
     private static void loadLastLogId() {
         if (fileNameFull.length() == 0) {
-            fileNameFull = System.getenv(Constants.ENV_VAR_RUNTIME_FILE_PATH)
+            fileNameFull = Settings.getInstance().getRuntimeDirectory()
                     + File.separator
                     + Constants.PERSISTENCE_SUBDIR
                     + File.separator

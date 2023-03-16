@@ -28,7 +28,7 @@ public class GameLogger {
 
     protected void init() {
         String dateGameStarted = Helpers.getDateForGameLog();
-        fileNameFull = System.getenv(Constants.ENV_VAR_RUNTIME_FILE_PATH)
+        fileNameFull = Settings.getInstance().getRuntimeDirectory()
                 + File.separator
                 + Constants.GAME_LOGS_SUBDIR
                 + File.separator

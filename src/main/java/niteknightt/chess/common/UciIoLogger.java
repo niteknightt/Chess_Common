@@ -30,7 +30,7 @@ public class UciIoLogger {
 
     protected void init() {
         String dateGameStarted = Helpers.getDateForUciLog();
-        fileNameFull = System.getenv(Constants.ENV_VAR_RUNTIME_FILE_PATH)
+        fileNameFull = Settings.getInstance().getRuntimeDirectory()
                 + File.separator
                 + Constants.UCI_LOGS_SUBDIR
                 + File.separator

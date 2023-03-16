@@ -17,9 +17,19 @@ public class Settings {
     private Enums.SettingsType _settingsType = Enums.SettingsType.NONE;
     private HashMap<String, String> _settings;
 
-    public static synchronized Settings getInstance(Enums.SettingsType settingsType) {
+    public static synchronized Settings createInstance(Enums.SettingsType settingsType) {
         if (_instance == null) {
             _instance = new Settings(settingsType);
+        }
+        else {
+            AppLogger.getInstance().error("Tried to create Settings when it already exists");
+        }
+        return _instance;
+    }
+
+    public static synchronized Settings getInstance() {
+        if (_instance == null) {
+            throw new RuntimeException("Requested instance of Settings before it was created");
         }
         return _instance;
     }
@@ -34,12 +44,15 @@ public class Settings {
         if (_settingsType == Enums.SettingsType.NITEKNIGHTTBOT) {
             fileName = Constants.SETTINGS_FILENAME_NITEKIGHTTBOT;
         }
+        else if (_settingsType == Enums.SettingsType.BOTTERBOT) {
+            fileName = Constants.SETTINGS_FILENAME_BOTTERBOT;
+        }
 
         if (fileName.length() == 0) {
             throw new RuntimeException("No settings file defined for app: " + _settingsType);
         }
 
-        String fullFileName = System.getenv(Constants.ENV_VAR_RUNTIME_FILE_PATH)
+        String fullFileName = getRuntimeDirectory()
                                 + File.separator
                                 + Constants.SETTINGS_SUBDIR
                                 + File.separator
@@ -83,4 +96,13 @@ public class Settings {
         return _settings.get(key);
     }
 
+    public String getRuntimeDirectory() {
+        return System.getenv(Constants.ENV_VAR_PREFIX + Constants.ENV_VAR_RUNTIME_FILE_PATH_SUFFIX)
+                + File.separator
+                + System.getenv(Constants.ENV_VAR_PREFIX + _settingsType + Constants.ENV_VAR_APP_NAME_SUFFIX);
+    }
+
+    public String getAccessToken() {
+        return System.getenv(Constants.ENV_VAR_PREFIX + _settingsType + Constants.ENV_VAR_ACCESS_TOKEN_SUFFIX);
+    }
 }

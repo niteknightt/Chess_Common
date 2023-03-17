@@ -36,6 +36,7 @@ public class Settings {
 
     private Settings(Enums.SettingsType settingsType) {
         _settingsType = settingsType;
+        _settings = new HashMap<>();
         loadFromFile();
     }
 
@@ -97,6 +98,12 @@ public class Settings {
     }
 
     public String getRuntimeDirectory() {
+        System.out.println("Getting env for: " + Constants.ENV_VAR_PREFIX + Constants.ENV_VAR_RUNTIME_FILE_PATH_SUFFIX);
+        String a = System.getenv(Constants.ENV_VAR_PREFIX + Constants.ENV_VAR_RUNTIME_FILE_PATH_SUFFIX);
+        System.out.println(a);
+        System.out.println("Getting env for: " + Constants.ENV_VAR_PREFIX + _settingsType + Constants.ENV_VAR_APP_NAME_SUFFIX);
+        String b = System.getenv(Constants.ENV_VAR_PREFIX + _settingsType + Constants.ENV_VAR_APP_NAME_SUFFIX);
+        System.out.println(b);
         return System.getenv(Constants.ENV_VAR_PREFIX + Constants.ENV_VAR_RUNTIME_FILE_PATH_SUFFIX)
                 + File.separator
                 + System.getenv(Constants.ENV_VAR_PREFIX + _settingsType + Constants.ENV_VAR_APP_NAME_SUFFIX);

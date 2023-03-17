@@ -208,7 +208,7 @@ public class Helpers {
         return proposedDateStr;
     }
 
-    public Enums.MoveEvalCategory categoryFromEval(double eval, Enums.Color playerColor) {
+    public static Enums.MoveEvalCategory categoryFromEval(double eval, Enums.Color playerColor) {
         double adjEval = (playerColor == Enums.Color.BLACK) ? eval * -1.0 : eval;
 
         if (adjEval >= Constants.MIN_VALUE_FOR_VERY_MUCH_BETTER) {

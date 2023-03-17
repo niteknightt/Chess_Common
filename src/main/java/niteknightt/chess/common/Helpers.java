@@ -207,4 +207,30 @@ public class Helpers {
         }
         return proposedDateStr;
     }
+
+    public Enums.MoveEvalCategory categoryFromEval(double eval, Enums.Color playerColor) {
+        double adjEval = (playerColor == Enums.Color.BLACK) ? eval * -1.0 : eval;
+
+        if (adjEval >= Constants.MIN_VALUE_FOR_VERY_MUCH_BETTER) {
+            return Enums.MoveEvalCategory.VERY_MUCH_BETTER_THAN_BEFORE;
+        }
+        else if (adjEval >= Constants.MIN_VALUE_FOR_MUCH_BETTER) {
+            return Enums.MoveEvalCategory.MUCH_BETTER_THAN_BEFORE;
+        }
+        else if (adjEval >= Constants.MIN_VALUE_FOR_SOMEWHAT_BETTER) {
+            return Enums.MoveEvalCategory.SOMEWHAT_BETTER_THAN_BEFORE;
+        }
+        else if (adjEval >= Constants.MAX_VALUE_FOR_SOMEWHAT_WORSE) {
+            return Enums.MoveEvalCategory.SAME_AS_BEFORE;
+        }
+        else if (adjEval >= Constants.MAX_VALUE_FOR_MUCH_WORSE) {
+            return Enums.MoveEvalCategory.SOMEWHAT_WORSE_THAN_BEFORE;
+        }
+        else if (adjEval >= Constants.MAX_VALUE_FOR_VERY_MUCH_WORSE) {
+            return Enums.MoveEvalCategory.MUCH_WORSE_THAN_BEFORE;
+        }
+        else {
+            return Enums.MoveEvalCategory.VERY_MUCH_WORSE_THAN_BEFORE;
+        }
+    }
 }

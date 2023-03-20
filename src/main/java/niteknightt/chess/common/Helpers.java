@@ -211,26 +211,26 @@ public class Helpers {
     public static Enums.MoveEvalCategory categoryFromEval(double eval, Enums.Color playerColor) {
         double adjEval = (playerColor == Enums.Color.BLACK) ? eval * -1.0 : eval;
 
-        if (adjEval >= Constants.MIN_VALUE_FOR_VERY_MUCH_BETTER) {
-            return Enums.MoveEvalCategory.VERY_MUCH_BETTER_THAN_BEFORE;
+        if (adjEval >= Constants.MIN_VALUE_FOR_WINNING) {
+            return Enums.MoveEvalCategory.WINNING;
         }
-        else if (adjEval >= Constants.MIN_VALUE_FOR_MUCH_BETTER) {
-            return Enums.MoveEvalCategory.MUCH_BETTER_THAN_BEFORE;
+        else if (adjEval >= Constants.MIN_VALUE_FOR_WELL_AHEAD) {
+            return Enums.MoveEvalCategory.WELL_AHEAD;
         }
-        else if (adjEval >= Constants.MIN_VALUE_FOR_SOMEWHAT_BETTER) {
-            return Enums.MoveEvalCategory.SOMEWHAT_BETTER_THAN_BEFORE;
+        else if (adjEval >= Constants.MIN_VALUE_FOR_LEADING) {
+            return Enums.MoveEvalCategory.LEADING;
         }
-        else if (adjEval >= Constants.MAX_VALUE_FOR_SOMEWHAT_WORSE) {
-            return Enums.MoveEvalCategory.SAME_AS_BEFORE;
+        else if (adjEval >= Constants.MAX_VALUE_FOR_LAGGING) {
+            return Enums.MoveEvalCategory.EQUAL;
         }
-        else if (adjEval >= Constants.MAX_VALUE_FOR_MUCH_WORSE) {
-            return Enums.MoveEvalCategory.SOMEWHAT_WORSE_THAN_BEFORE;
+        else if (adjEval >= Constants.MAX_VALUE_FOR_WELL_BEHIND) {
+            return Enums.MoveEvalCategory.LAGGING;
         }
-        else if (adjEval >= Constants.MAX_VALUE_FOR_VERY_MUCH_WORSE) {
-            return Enums.MoveEvalCategory.MUCH_WORSE_THAN_BEFORE;
+        else if (adjEval >= Constants.MAX_VALUE_FOR_LOSING) {
+            return Enums.MoveEvalCategory.WELL_BEHIND;
         }
         else {
-            return Enums.MoveEvalCategory.VERY_MUCH_WORSE_THAN_BEFORE;
+            return Enums.MoveEvalCategory.LOSING;
         }
     }
 }

@@ -129,6 +129,17 @@ public class Enums {
 
     public enum MoveEvalCategory {
         NONE,
+        WINNING,
+        WELL_AHEAD,
+        LEADING,
+        EQUAL,
+        LAGGING,
+        WELL_BEHIND,
+        LOSING
+    }
+
+    public enum MoveEvalCategoryComparison {
+        NONE,
         VERY_MUCH_BETTER_THAN_BEFORE,
         MUCH_BETTER_THAN_BEFORE,
         SOMEWHAT_BETTER_THAN_BEFORE,

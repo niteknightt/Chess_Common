@@ -124,7 +124,8 @@ public class Enums {
     public enum SettingsType {
         NONE,
         NITEKNIGHTTBOT,
-        BOTTERBOT
+        BOTTERBOT,
+        USERSTATS
     }
 
     public enum MoveEvalCategory {

@@ -48,6 +48,9 @@ public class Settings {
         else if (_settingsType == Enums.SettingsType.BOTTERBOT) {
             fileName = Constants.SETTINGS_FILENAME_BOTTERBOT;
         }
+        else if (_settingsType == Enums.SettingsType.USERSTATS) {
+            fileName = Constants.SETTINGS_FILENAME_USERSTATS;
+        }
 
         if (fileName.length() == 0) {
             throw new RuntimeException("No settings file defined for app: " + _settingsType);
@@ -90,11 +93,60 @@ public class Settings {
         _settings.put(key, val);
     }
 
-    public String getSetting(String key) {
+    protected String getSetting(String key) {
         if (!_settings.containsKey(key)) {
-            return null;
+            AppLogger.getInstance().error("Count not find settings key " + key);
+            throw new NonExistingSettingException();
         }
         return _settings.get(key);
+    }
+
+    public String getString(String key) {
+        return getSetting(key);
+    }
+
+    public int getInt(String key) {
+        String val = getSetting(key);
+        try {
+            return Integer.parseInt(val);
+        }
+        catch (NumberFormatException ex) {
+            AppLogger.getInstance().error("Count not format int from val " + val + " received from settings key " + key);
+            throw new IntFormatException();
+        }
+    }
+
+    public float getFloat(String key) {
+        String val = getSetting(key);
+        try {
+            return Float.parseFloat(val);
+        }
+        catch (NumberFormatException ex) {
+            AppLogger.getInstance().error("Count not format float from val " + val + " received from settings key " + key);
+            throw new FloatFormatException();
+        }
+    }
+
+    public double getDouble(String key) {
+        String val = getSetting(key);
+        try {
+            return Double.parseDouble(val);
+        }
+        catch (NumberFormatException ex) {
+            AppLogger.getInstance().error("Count not format double from val " + val + " received from settings key " + key);
+            throw new DoubleFormatException();
+        }
+    }
+
+    public boolean getBoolean(String key) {
+        String val = getSetting(key);
+        try {
+            return Boolean.parseBoolean(val);
+        }
+        catch (NumberFormatException ex) {
+            AppLogger.getInstance().error("Count not format boolean from val " + val + " received from settings key " + key);
+            throw new BooleanFormatException();
+        }
     }
 
     public String getRuntimeDirectory() {

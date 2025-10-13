@@ -42,7 +42,10 @@ public class Settings {
 
     private void loadFromFile() {
         String fileName = "";
-        if (_settingsType == Enums.SettingsType.NITEKNIGHTTBOT) {
+        if (_settingsType == Enums.SettingsType.COMMON) {
+            fileName = Constants.SETTINGS_FILENAME_COMMON;
+        }
+        else if (_settingsType == Enums.SettingsType.NITEKNIGHTTBOT) {
             fileName = Constants.SETTINGS_FILENAME_NITEKIGHTTBOT;
         }
         else if (_settingsType == Enums.SettingsType.BOTTERBOT) {

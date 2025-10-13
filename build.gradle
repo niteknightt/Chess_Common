@@ -3,16 +3,17 @@ plugins {
     id 'maven-publish'
 }
 
-group 'niteknightt.chess'
-version '0.1'
+group = 'niteknightt.chess'
+version = '0.3.000'
+archivesBaseName = 'chess-common'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 test {
@@ -20,22 +21,19 @@ test {
 }
 
 publishing {
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/niteknightt/chess_common")
+            url = uri("https://maven.pkg.github.com/niteknightt/Chess_Common")
             credentials {
                 username = System.getenv("NN_GITHUB_USER")
                 password = System.getenv("NN_GITHUB_ACCESS_TOKEN")
             }
-        }
-    }
-    publications {
-        gpr(MavenPublication) {
-            groupId='niteknightt.chess'
-            artifactId='common'
-            version='0.2.022'
-            from(components.java)
         }
     }
 }

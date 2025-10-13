@@ -93,11 +93,13 @@ public class Helpers {
     }
 
     public static long getNextLogId() {
+        if (!logInitFlag) {
+            initLog();
+        }
+
+        logIdLock.lock();
+
         try {
-            if (!logInitFlag) {
-                initLog();
-            }
-            logIdLock.lock();
             lastLogId += LOG_ID_INCREMENT;
             saveLastLogId();
             return lastLogId;

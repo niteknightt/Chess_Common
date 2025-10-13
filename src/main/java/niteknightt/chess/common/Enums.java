@@ -123,6 +123,7 @@ public class Enums {
 
     public enum SettingsType {
         NONE,
+        COMMON,
         NITEKNIGHTTBOT,
         BOTTERBOT,
         USERSTATS

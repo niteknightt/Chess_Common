@@ -3,8 +3,14 @@ plugins {
     id 'maven-publish'
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 group = 'niteknightt.chess'
-version = '0.3.000'
+version = '0.3.001'
 archivesBaseName = 'chess-common'
 
 repositories {
@@ -23,6 +29,7 @@ test {
 publishing {
     publications {
         gpr(MavenPublication) {
+            artifactId = 'common'
             from(components.java)
         }
     }
